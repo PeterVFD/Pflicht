@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vodafone Präsenz Rechner</title>
+  <style>
+    :root {
+      --vf-red: #e60000;
+      --vf-red-dark: #b80000;
+      --bg: #f5f5f5;
+      --card: #ffffff;
+      --text: #1f1f1f;
+      --muted: #666;
+      --border: #d9d9d9;
+      --input-bg: #ffffff;
+      --readonly-bg: #fafafa;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px;
+      font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      border: 1px solid #eee;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--vf-red), #ff3347);
+      color: #fff;
+      padding: 20px 24px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .header .sub {
+      margin-top: 6px;
+      font-size: 13px;
+      opacity: 0.95;
+    }
+
+    .content {
+      padding: 24px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px 20px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+      background: var(--input-bg);
+      color: var(--text);
+    }
+
+    textarea[readonly] {
+      background: var(--readonly-bg);
+    }
+
+    .radio-group,
+    .check-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      padding-top: 4px;
+    }
+
+    .radio-item,
+    .check-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 22px;
+      margin-bottom: 18px;
+    }
+
+    button {
+      border: none;
+      border-radius: 8px;
+      padding: 12px 18px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .btn-primary {
+      background: var(--vf-red);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: var(--vf-red-dark);
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #222;
+      border: 1px solid #d0d0d0;
+    }
+
+    .btn-secondary:hover {
+      background: #e8e8e8;
+    }
+
+    .result-label {
+      margin-top: 10px;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    #ergebnis {
+      min-height: 320px;
+      resize: vertical;
+      font-family: Consolas, "Courier New", monospace;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
+
+    .footer-note {
+      margin-top: 14px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 760px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .button-row {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="header">
+        <h1>Vodafone Präsenz Rechner</h1>
+        <div class="sub">Präsenz-Berechnung und Mail-Versand</div>
+      </div>
+
+      <div class="content">
+        <div class="grid">
+          <div class="field full">
+            <label>Persönliches Arbeitsmodell</label>
+            <div class="radio-group">
+              <label class="radio-item">
+                <input type="radio" name="arbeitsmodell" value="4" checked />
+                4 Tage Woche
+              </label>
+              <label class="radio-item">
+                <input type="radio" name="arbeitsmodell" value="5" />
+                5 Tage Woche
+              </label>
+            </div>
+          </div>
+
+          <div class="field full">
+            <label for="stdInput">Arbeitszeit (Tagesstunden z. B. 7,7 ODER Wochenstunden z. B. 38,5)</label>
+            <input type="text" id="stdInput" value="7,7" />
+          </div>
+
+          <div class="field full">
+            <div class="check-group">
+              <label class="check-item">
+                <input type="checkbox" id="useHours" checked />
+                Teilzeit nach Stunden berücksichtigen
+              </label>
+              <label class="check-item">
+                <input type="checkbox" id="countFeiertage" checked />
+                Feiertage reduzieren Pflichtpräsenz
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="monat">Monat (1–12)</label>
+            <input type="number" id="monat" min="1" max="12" />
+          </div>
+
+          <div class="field">
+            <label for="jahr">Jahr</label>
+            <input type="number" id="jahr" min="2000" max="2100" />
+          </div>
+
+          <div class="field">
+            <label for="feiertage">Feiertage im Monat (manuell)</label>
+            <input type="number" id="feiertage" min="0" step="1" value="0" />
+          </div>
+
+          <div class="field">
+            <label for="urlaub">Urlaubstage im Monat</label>
+            <input type="number" id="urlaub" min="0" step="1" value="0" />
+          </div>
+
+          <div class="field">
+            <label for="krank">Kranktage im Monat</label>
+            <input type="number" id="krank" min="0" step="1" value="0" />
+          </div>
+
+          <div class="field full">
+            <div class="button-row">
+              <button class="btn-primary" id="btnBerechnen">Präsenz berechnen</button>
+              <button class="btn-secondary" id="btnMail">Ergebnis senden</button>
+            </div>
+          </div>
+
+          <div class="field full">
+            <div class="result-label">Ergebnis</div>
+            <textarea id="ergebnis" readonly></textarea>
+            <div class="footer-note">
+              Der Mail-Versand nutzt <strong>mailto:</strong>. Je nach Browser/Client wird dein Standard-Mailprogramm geöffnet.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let ergebnisText = "";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const now = new Date();
+      document.getElementById("monat").value = now.getMonth() + 1;
+      document.getElementById("jahr").value = now.getFullYear();
+
+      document.getElementById("btnBerechnen").addEventListener("click", berechnen);
+      document.getElementById("btnMail").addEventListener("click", mailOhnePdf);
+    });
+
+    function berechnen() {
+      const stdInputRaw = (document.getElementById("stdInput").value || "").trim();
+      const feiertage = parseIntSafe(document.getElementById("feiertage").value, 0);
+      const urlaub = parseIntSafe(document.getElementById("urlaub").value, 0);
+      const krank = parseIntSafe(document.getElementById("krank").value, 0);
+      const monat = parseIntSafe(document.getElementById("monat").value, 0);
+      const jahr = parseIntSafe(document.getElementById("jahr").value, 0);
+      const useHours = document.getElementById("useHours").checked;
+      const countFeiertage = document.getElementById("countFeiertage").checked;
+
+      const modellRadio = document.querySelector('input[name="arbeitsmodell"]:checked');
+      const arbeitsmodell = modellRadio ? parseInt(modellRadio.value, 10) : 4;
+
+      if (monat < 1 || monat > 12) {
+        alert("Bitte einen gültigen Monat zwischen 1 und 12 eingeben.");
+        return;
+      }
+
+      if (jahr < 2000 || jahr > 2100) {
+        alert("Bitte ein gültiges Jahr eingeben.");
+        return;
+      }
+
+      let stdVal = parseGermanNumber(stdInputRaw || "0");
+
+      if (isNaN(stdVal)) {
+        alert("Die Arbeitszeit ist ungültig. Bitte z. B. 7,7 oder 38,5 eingeben.");
+        return;
+      }
+
+      let tagesStd = 0;
+      let wochenStd = 0;
+      let inputArt = "";
+
+      if (stdVal <= 12.0) {
+        tagesStd = stdVal;
+        wochenStd = tagesStd * arbeitsmodell;
+        inputArt = "Tagesstunden";
+      } else {
+        wochenStd = stdVal;
+        tagesStd = wochenStd / arbeitsmodell;
+        inputArt = "Wochenstunden";
+      }
+
+      const tagesStdA = formatDecimalDE(tagesStd, 2);
+      const wochenStdA = formatDecimalDE(wochenStd, 2);
+
+      const basisPraesenzFT = arbeitsmodell === 4 ? 6 : 8;
+
+      let faktor = 1.0;
+
+      if (useHours) {
+        let wochenStdEff = wochenStd;
+        if (wochenStdEff > 40) wochenStdEff = 40;
+
+        if (wochenStdEff >= 35) {
+          faktor = 1.0;
+        } else {
+          faktor = wochenStdEff / 40.0;
+        }
+      }
+
+      const basisPraesenz = basisPraesenzFT * faktor;
+      const basisPraesenzA = formatDecimalDE(basisPraesenz, 2);
+
+      const pflichttageGesamt = calcWorkdaysInMonth(jahr, monat);
+
+      let abz = urlaub + krank;
+      if (countFeiertage) {
+        abz += feiertage;
+      }
+
+      let pflichttageNetto = pflichttageGesamt - abz;
+      if (pflichttageNetto < 0) {
+        pflichttageNetto = 0;
+      }
+
+      let quote = 0;
+      if (pflichttageGesamt > 0) {
+        quote = basisPraesenz * (pflichttageNetto / pflichttageGesamt);
+      }
+
+      const neuePraesenz = formatDecimalDE(quote, 2);
+      const neuePraesenzGerundet = roundHalfUp(quote);
+
+      const basisGerundet = roundHalfUp(basisPraesenz);
+      const diff = neuePraesenzGerundet - basisGerundet;
+      const diffText = diff > 0 ? `+${diff}` : `${diff}`;
+
+      ergebnisText =
+        "Vodafone Praesenznachweis\n" +
+        "----------------------------------\n" +
+        `Monat: ${monat}/${jahr}\n` +
+        `Arbeitsmodell: ${arbeitsmodell} Tage Woche\n` +
+        `Eingabe: ${stdInputRaw || "0"} (${inputArt})\n` +
+        `Tagesstunden: ${tagesStdA}  |  Wochenstunden: ${wochenStdA}\n\n` +
+        `Pflichttage gesamt (Mo-Fr): ${pflichttageGesamt}\n` +
+        `Feiertage: -${feiertage} ${countFeiertage ? "(beruecksichtigt)" : "(ignoriert)"}\n` +
+        `Urlaub: -${urlaub}\n` +
+        `Krankheit: -${krank}\n` +
+        `Pflichttage netto: ${pflichttageNetto}\n\n` +
+        `Basis Praesenz (Vollzeit): ${basisPraesenzFT} Tage\n` +
+        `Basis Praesenz (mit Faktor): ${basisPraesenzA} Tage\n` +
+        `Neue Praesenzpflicht: ${neuePraesenz} Tage\n` +
+        `Gerundet: ${neuePraesenzGerundet} Tage\n` +
+        `Differenz zur Basis (gerundet): ${diffText} Tage`;
+
+      document.getElementById("ergebnis").value = ergebnisText;
+    }
+
+    function mailOhnePdf() {
+      if (!ergebnisText) {
+        alert("Bitte zuerst berechnen.");
+        return;
+      }
+
+      const monat = document.getElementById("monat").value;
+      const jahr = document.getElementById("jahr").value;
+
+      const betreff = `Praesenznachweis ${monat}/${jahr}`;
+      const text =
+`Guten Tag,
+
+nachfolgend mein Praesenznachweis fuer ${monat}/${jahr}:
+
+-------------------------
+${ergebnisText}
+-------------------------
+
+Viele Gruesse`;
+
+      const uri = `mailto:?subject=${encodeURIComponent(betreff)}&body=${encodeURIComponent(text)}`;
+      window.location.href = uri;
+    }
+
+    function calcWorkdaysInMonth(jahr, monat) {
+      let count = 0;
+      const tage = daysInMonth(jahr, monat);
+
+      for (let tag = 1; tag <= tage; tag++) {
+        const d = new Date(jahr, monat - 1, tag);
+        const wd = d.getDay(); // 0=So, 1=Mo, ... 6=Sa
+
+        if (wd >= 1 && wd <= 5) {
+          count++;
+        }
+      }
+
+      return count;
+    }
+
+    function daysInMonth(y, m) {
+      if (m === 2) return isLeapYear(y) ? 29 : 28;
+      return (m === 4 || m === 6 || m === 9 || m === 11) ? 30 : 31;
+    }
+
+    function isLeapYear(y) {
+      if (y % 400 === 0) return true;
+      if (y % 100 === 0) return false;
+      return y % 4 === 0;
+    }
+
+    function roundHalfUp(x) {
+      if (x >= 0) {
+        return Math.floor(x + 0.5);
+      } else {
+        return Math.ceil(x - 0.5);
+      }
+    }
+
+    function formatDecimalDE(val, decimals = 2) {
+      return Number(val).toFixed(decimals).replace(".", ",");
+    }
+
+    function parseGermanNumber(value) {
+      if (value === null || value === undefined) return NaN;
+      const normalized = String(value).trim().replace(",", ".");
+      return Number(normalized);
+    }
+
+    function parseIntSafe(value, fallback = 0) {
+      const n = parseInt(value, 10);
+      return isNaN(n) || n < 0 ? fallback : n;
+    }
+  </script>
+</body>
+</html>
