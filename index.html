@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  
-<script>
-  window.PROTECTED_HUB_URL = "https://petervfd.github.io/haupt/";
-</script>
-<script src="schutz.js"></script>
+  <script>
+    window.PROTECTED_HUB_URL = "https://petervfd.github.io/haupt/";
+  </script>
+  <script src="schutz.js"></script>
 
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -175,12 +174,30 @@
       font-weight: 700;
     }
 
-    #ergebnis {
+    .ergebnis-box {
       min-height: 320px;
-      resize: vertical;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      background: var(--readonly-bg);
       font-family: Consolas, "Courier New", monospace;
-      line-height: 1.45;
+      line-height: 1.55;
       white-space: pre-wrap;
+    }
+
+    .ergebnis-line {
+      margin-bottom: 4px;
+    }
+
+    .ergebnis-gerundet {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      background: #fff2f2;
+      border: 1px solid #f3b0b0;
+      color: #b80000;
+      font-weight: 700;
+      font-size: 18px;
     }
 
     .footer-note {
@@ -280,7 +297,7 @@
 
           <div class="field full">
             <div class="result-label">Ergebnis</div>
-            <textarea id="ergebnis" readonly></textarea>
+            <div id="ergebnis" class="ergebnis-box"></div>
             <div class="footer-note">
               Der Mail-Versand nutzt <strong>mailto:</strong>. Je nach Browser/Client wird dein Standard-Mailprogramm geöffnet.
             </div>
@@ -409,7 +426,26 @@
         `Gerundet: ${neuePraesenzGerundet} Tage\n` +
         `Differenz zur Basis (gerundet): ${diffText} Tage`;
 
-      document.getElementById("ergebnis").value = ergebnisText;
+      document.getElementById("ergebnis").innerHTML = `
+        <div class="ergebnis-line">Praesenznachweis</div>
+        <div class="ergebnis-line">----------------------------------</div>
+        <div class="ergebnis-line">Monat: ${monat}/${jahr}</div>
+        <div class="ergebnis-line">Arbeitsmodell: ${arbeitsmodell} Tage Woche</div>
+        <div class="ergebnis-line">Eingabe: ${stdInputRaw || "0"} (${inputArt})</div>
+        <div class="ergebnis-line">Tagesstunden: ${tagesStdA} | Wochenstunden: ${wochenStdA}</div>
+        <br>
+        <div class="ergebnis-line">Pflichttage gesamt (Mo-Fr): ${pflichttageGesamt}</div>
+        <div class="ergebnis-line">Feiertage: -${feiertage} ${countFeiertage ? "(beruecksichtigt)" : "(ignoriert)"}</div>
+        <div class="ergebnis-line">Urlaub: -${urlaub}</div>
+        <div class="ergebnis-line">Krankheit: -${krank}</div>
+        <div class="ergebnis-line">Pflichttage netto: ${pflichttageNetto}</div>
+        <br>
+        <div class="ergebnis-line">Basis Praesenz (Vollzeit): ${basisPraesenzFT} Tage</div>
+        <div class="ergebnis-line">Basis Praesenz (mit Faktor): ${basisPraesenzA} Tage</div>
+        <div class="ergebnis-line">Neue Praesenzpflicht: ${neuePraesenz} Tage</div>
+        <div class="ergebnis-gerundet">Gerundet: ${neuePraesenzGerundet} Tage</div>
+        <div class="ergebnis-line" style="margin-top:8px;">Differenz zur Basis (gerundet): ${diffText} Tage</div>
+      `;
     }
 
     function mailOhnePdf() {
@@ -443,7 +479,7 @@ Viele Gruesse`;
 
       for (let tag = 1; tag <= tage; tag++) {
         const d = new Date(jahr, monat - 1, tag);
-        const wd = d.getDay(); // 0=So, 1=Mo, ... 6=Sa
+        const wd = d.getDay();
 
         if (wd >= 1 && wd <= 5) {
           count++;
