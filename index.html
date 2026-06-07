@@ -9,6 +9,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Präsenz Rechner</title>
+
   <style>
     :root {
       --vf-red: #e60000;
@@ -97,8 +98,7 @@
     }
 
     input[type="text"],
-    input[type="number"],
-    textarea {
+    input[type="number"] {
       width: 100%;
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -106,10 +106,6 @@
       font-size: 14px;
       background: var(--input-bg);
       color: var(--text);
-    }
-
-    textarea[readonly] {
-      background: var(--readonly-bg);
     }
 
     .radio-group,
@@ -175,29 +171,34 @@
     }
 
     .ergebnis-box {
-      min-height: 320px;
+      min-height: 220px;
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 12px;
+      padding: 8px 10px;
       background: var(--readonly-bg);
       font-family: Consolas, "Courier New", monospace;
-      line-height: 1.55;
-      white-space: pre-wrap;
+      font-size: 13px;
+      line-height: 1.2;
+      white-space: normal;
     }
 
     .ergebnis-line {
-      margin-bottom: 4px;
+      margin-bottom: 1px;
+    }
+
+    .ergebnis-sep {
+      height: 3px;
     }
 
     .ergebnis-gerundet {
-      margin-top: 10px;
-      padding: 10px 12px;
-      border-radius: 8px;
+      margin-top: 4px;
+      padding: 4px 8px;
+      border-radius: 6px;
       background: #fff2f2;
       border: 1px solid #f3b0b0;
       color: #b80000;
       font-weight: 700;
-      font-size: 18px;
+      font-size: 17px;
     }
 
     .footer-note {
@@ -221,6 +222,7 @@
     }
   </style>
 </head>
+
 <body style="display:none;">
   <div class="wrap">
     <div class="card">
@@ -414,12 +416,12 @@
         `Monat: ${monat}/${jahr}\n` +
         `Arbeitsmodell: ${arbeitsmodell} Tage Woche\n` +
         `Eingabe: ${stdInputRaw || "0"} (${inputArt})\n` +
-        `Tagesstunden: ${tagesStdA}  |  Wochenstunden: ${wochenStdA}\n\n` +
+        `Tagesstunden: ${tagesStdA} | Wochenstunden: ${wochenStdA}\n` +
         `Pflichttage gesamt (Mo-Fr): ${pflichttageGesamt}\n` +
         `Feiertage: -${feiertage} ${countFeiertage ? "(beruecksichtigt)" : "(ignoriert)"}\n` +
         `Urlaub: -${urlaub}\n` +
         `Krankheit: -${krank}\n` +
-        `Pflichttage netto: ${pflichttageNetto}\n\n` +
+        `Pflichttage netto: ${pflichttageNetto}\n` +
         `Basis Praesenz (Vollzeit): ${basisPraesenzFT} Tage\n` +
         `Basis Praesenz (mit Faktor): ${basisPraesenzA} Tage\n` +
         `Neue Praesenzpflicht: ${neuePraesenz} Tage\n` +
@@ -433,18 +435,22 @@
         <div class="ergebnis-line">Arbeitsmodell: ${arbeitsmodell} Tage Woche</div>
         <div class="ergebnis-line">Eingabe: ${stdInputRaw || "0"} (${inputArt})</div>
         <div class="ergebnis-line">Tagesstunden: ${tagesStdA} | Wochenstunden: ${wochenStdA}</div>
-        <br>
+
+        <div class="ergebnis-sep"></div>
+
         <div class="ergebnis-line">Pflichttage gesamt (Mo-Fr): ${pflichttageGesamt}</div>
         <div class="ergebnis-line">Feiertage: -${feiertage} ${countFeiertage ? "(beruecksichtigt)" : "(ignoriert)"}</div>
         <div class="ergebnis-line">Urlaub: -${urlaub}</div>
         <div class="ergebnis-line">Krankheit: -${krank}</div>
         <div class="ergebnis-line">Pflichttage netto: ${pflichttageNetto}</div>
-        <br>
+
+        <div class="ergebnis-sep"></div>
+
         <div class="ergebnis-line">Basis Praesenz (Vollzeit): ${basisPraesenzFT} Tage</div>
         <div class="ergebnis-line">Basis Praesenz (mit Faktor): ${basisPraesenzA} Tage</div>
         <div class="ergebnis-line">Neue Praesenzpflicht: ${neuePraesenz} Tage</div>
         <div class="ergebnis-gerundet">Gerundet: ${neuePraesenzGerundet} Tage</div>
-        <div class="ergebnis-line" style="margin-top:8px;">Differenz zur Basis (gerundet): ${diffText} Tage</div>
+        <div class="ergebnis-line" style="margin-top:4px;">Differenz zur Basis (gerundet): ${diffText} Tage</div>
       `;
     }
 
@@ -479,7 +485,7 @@ Viele Gruesse`;
 
       for (let tag = 1; tag <= tage; tag++) {
         const d = new Date(jahr, monat - 1, tag);
-        const wd = d.getDay();
+        const wd = d.getDay(); // 0=So, 1=Mo, ... 6=Sa
 
         if (wd >= 1 && wd <= 5) {
           count++;
